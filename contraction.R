@@ -37,7 +37,7 @@ dateTicks <-
     paste0("2016-07-08 ", c("6:00", "9:00", "12:00", "15:00", "18:00"), ":00") %>%
       as.POSIXct(format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
 
-durationPlot <-
+timePlot <-
     dat %>%
       ggplot() + theme_bw() +
       geom_segment(aes(x = startTime, xend = startTime,
@@ -48,5 +48,16 @@ durationPlot <-
                        labels = date_format("%H:%M", tz = "UTC")) +
       scale_y_continuous("Contraction duration (s)")
 
+
+durationPlot <-
+    dat %>%
+    ggplot() + theme_bw() + 
+    geom_line(aes(contractionID, as.numeric(duration))) +
+    geom_ribbon(aes(x = contractionID, ymin = 45, ymax = 90),
+                alpha = 0.4) +
+    scale_x_continuous("Contraction ID") +
+    scale_y_continuous("Contraction duration (s)")
+
+ggsave("timePlot.png", timePlot)
 ggsave("intervalPlot.png", intervalPlot)
 ggsave("durationPlot.png", durationPlot)
