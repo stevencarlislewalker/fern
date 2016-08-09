@@ -10,15 +10,20 @@ output:
 
 ## The birth of Fern
 
-On July 8, 2016 at 11:08pm, my daughter was born.  She is adorable.  Here she is on July 9.
+On July 8, 2016 at 11:08pm, my daughter was born.  She is adorable.
+Here she is on July 9.
 
 ![Fern](FernWalker.png)
 
 ## The contraction data
 
-At about 6:15am on July 8, Fern's Mom started having contractions.  Our midwives said to call them once the contractions were consistently 3-4 minutes apart for at least one hour, and that the contractions themselves were between 45-90s in duration.  I started collecting data.
+At about 6:15am on July 8, Fern's Mom started having contractions.
+Our midwives said to call them once the contractions were consistently
+3-4 minutes apart for at least one hour, and that the contractions
+themselves were between 45-90s in duration.  I started collecting
+data.
 
-![Raw Data]
+![Raw Data](rawData.png)
 
 Here are the first (and last) six observations that I recorded.
 
@@ -29,7 +34,6 @@ library(fasttime)
 library(lubridate)
 library(ggplot2)
 library(scales)
-library(plotly)
 dat <-
     fread("contractionData.csv",
           colClasses = c("character", "integer")) %>%
@@ -49,7 +53,7 @@ Of primary interest are the inter-contraction intervals.
 ```{r, warning = FALSE}
 dat <- dat %>%
   mutate(interval = as.duration(startTime - lag(startTime)))
-knitr:::kable(dat[5:10])
+knitr:::kable(dat[5:10,])
 ```
 
 ## Exploratory graphs
@@ -69,19 +73,36 @@ intervalPlot <-
 print(intervalPlot)
 ```
 
-The inter-contraction intervals are more variable and generally larger near the beginning of labour.  It looks like the intervals might converge on 3-4 minutes --- shown by the horizontal band --- just before we get ready to go to the hospital!  But what kind of model might determine such convergence?
+The inter-contraction intervals are more variable and generally larger
+near the beginning of labour.  It looks like the intervals might
+converge on 3-4 minutes --- shown by the horizontal band --- just
+before we get ready to go to the hospital!  But what kind of model
+might determine such convergence?
 
 ## An initial model
 
-It looks like the mean inter-contraction interval starts off somewhere near 30 minutes and then declines to asymptotically approach 3-4 minutes.  A model with these characteristics is given by the following.
+It looks like the mean inter-contraction interval starts off somewhere
+near 30 minutes and then declines to asymptotically approach 3-4
+minutes.  A model with these characteristics is given by the
+following.
 
-$$ y = \kappa_1 e^{- \alpha x} + \kappa_2 (1 - e^{- \alpha x}) + \epsilon $$
+```{r, echo = FALSE}
+source("fernFunctions.R")
+makeEquation(
+  "initialModel",
+  '$y = \\kappa_1 e^{- \\alpha x} + \\kappa_2 (1 - e^{- \\alpha x}) + \\epsilon$')
+```
+![initial model](initialModel.png)
 
-where $y$ and $x$ are the inter-contraction interval and contraction ID, $\kappa_1$ and $\kappa_2$ are the initial and final inter-contraction times, $\alpha$ is a parameter controlling the rate of decline from $\kappa_1$ to $\kappa_2$, and $\epsilon$ is normally distributed error.
+where $y$ and $x$ are the inter-contraction interval and contraction
+ID, $\kappa_1$ and $\kappa_2$ are the initial and final
+inter-contraction times, $\alpha$ is a parameter controlling the rate
+of decline from $\kappa_1$ to $\kappa_2$, and $\epsilon$ is normally
+distributed error.
 
 ## Fitting the model
 
-```{r}
+```{r, eval = FALSE}
 plotCurve <- function(alpha, k1, k2) {
     x <- 1:nrow(dat)
     logy <- log(exp(k1) * exp(- alpha * x) + exp(k2) * (1 - exp(- alpha * x)))
