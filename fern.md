@@ -82,7 +82,7 @@ intervalPlot <-
 print(intervalPlot)
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+![plot of chunk intervalPlot](figure/intervalPlot-1.png)
 
 The inter-contraction intervals are more variable and generally larger
 near the beginning of labour.  It looks like the intervals might
