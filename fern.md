@@ -110,16 +110,6 @@ distributed error.
 
 
 ```r
-plotCurve <- function(alpha, k1, k2) {
-    x <- 1:nrow(dat)
-    logy <- log(exp(k1) * exp(- alpha * x) + exp(k2) * (1 - exp(- alpha * x)))
-    plot(x, logy, type = "l", ylim = c(0, log(55)), lwd = 3, las = 1,
-         xlab = "Contraction ID", ylab = "Inter-contraction interval (min)")
-    with(dat, lines(contractionID, log(as.numeric(interval) / 60)))
-    abline(h = c(k1, k2), lty = 2)
-}
-plotCurve(0.014, 2.56, -5.9)
-
 datNoNA <- dat %>%
   as_data_frame %>%
   filter(!is.na(interval))
@@ -127,14 +117,47 @@ nonLinearFormula <-
     log(as.numeric(interval) / 60) ~
     log(exp(k1) *      exp(- alpha * contractionID) + 
         exp(k2) * (1 - exp(- alpha * contractionID)))
-mod <- nls(nonLinearFormula, data = datNoNA, 
+mod <- try({
+nls(nonLinearFormula, data = datNoNA, 
            start = list(alpha = 0.05, k1 = 3.5, k2 = 1.2),
            trace = TRUE)
 do.call(plotCurve, as.list(coef(mod)))
 summary(mod)
-
-## confidence interval on the estimated asymptotic inter-contraction interval
-k2Hat <- coef(mod)["k2"]
-k2SE <- sqrt(vcov(mod)["k2", "k2"])
-exp(k2Hat + c(lower = -1.96 * k2SE, estimate = 0, upper = 1.96 * k2SE))
+})
 ```
+
+```
+## 25.72467 :  0.05 3.50 1.20
+## 19.98647 :  0.0225624 2.5972410 0.9413003
+## 19.87928 :  0.01961596 2.58824426 0.65361020
+## 19.84303 :  0.01733377 2.58006953 0.25010658
+## 19.76538 :   0.01644099  2.57642837 -0.06153443
+## 19.71977 :   0.01564724  2.57296818 -0.48277571
+## 19.71845 :   0.01493905  2.56970383 -1.11928151
+## 19.70684 :   0.01462209  2.56817979 -1.71923878
+## 19.69694 :   0.01447198  2.56744188 -2.26266929
+## 19.68983 :   0.0143989  2.5670785 -2.7285180
+## 19.6891 :   0.0143268  2.5667177 -3.4687007
+## 19.689 :   0.01429122  2.56653880 -4.24358857
+## 19.68793 :   0.01428238  2.56649428 -4.66380123
+## 19.68753 :   0.01427356  2.56644980 -5.30314699
+## 19.68728 :   0.01426916  2.56642758 -5.90891400
+```
+
+```r
+mod
+```
+
+```
+## [1] "Error in nls(nonLinearFormula, data = datNoNA, start = list(alpha = 0.05,  : \n  step factor 0.000488281 reduced below 'minFactor' of 0.000976562\n"
+## attr(,"class")
+## [1] "try-error"
+## attr(,"condition")
+## <simpleError in nls(nonLinearFormula, data = datNoNA, start = list(alpha = 0.05,     k1 = 3.5, k2 = 1.2), trace = TRUE): step factor 0.000488281 reduced below 'minFactor' of 0.000976562>
+```
+
+This is a stupid error.  The nonlinear solver chases unrealistically low asymptotic inter-contraction intervals.
+
+
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
