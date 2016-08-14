@@ -8,6 +8,8 @@ output:
     theme: 'united'
 ---
 
+
+
 ## The birth of Fern
 
 On July 8, 2016 at 11:09pm, my daughter was born.  She is adorable.
@@ -63,22 +65,16 @@ knitr:::kable(dat[5:10,])
 |8  |             8|2016-07-08 09:05:00 |      25S|  840s (~14 minutes)|
 |9  |             9|2016-07-08 09:22:00 |      47S| 1020s (~17 minutes)|
 |10 |            10|2016-07-08 09:36:00 |      31S|  840s (~14 minutes)|
+## An initial model
 
-## Exploratory graphs
+The first step in model building is to look at the data.
 
 
 ```r
 intervalPlot <-
-    dat %>%
-    filter(!is.na(interval)) %>%
-    ggplot() + theme_bw() + 
-    geom_line(aes(contractionID, as.numeric(interval) / 60)) +
-    geom_ribbon(aes(x = contractionID, ymin = 3, ymax = 4),
-                alpha = 0.4) +
-    scale_x_continuous("Contraction ID") +
-   scale_y_continuous("Inter-contraction interval (min)\n(log scale)",
-                      trans = "log", 
-                      breaks = c(2, 4, 8, 16, 32, 64))
+    makeIntervalPlot(dat) +
+    scale_y_continuous("Inter-contraction interval (min)",
+    expand = c(0, 1))
 print(intervalPlot)
 ```
 
@@ -90,8 +86,6 @@ converge on 3-4 minutes --- shown by the horizontal band --- just
 before we get ready to go to the hospital!  But what kind of model
 might determine such convergence?
 
-## An initial model
-
 It looks like the mean inter-contraction interval starts off somewhere
 near 30 minutes and then declines to asymptotically approach 3-4
 minutes.  A model with these characteristics is given by the
@@ -100,13 +94,35 @@ following.
 
 ![initial model](initialModel.png)
 
+
+![math symbols](mathSymbols.png)
+
 where $y$ and $x$ are the inter-contraction interval and contraction
 ID, $\kappa_1$ and $\kappa_2$ are the initial and final
 inter-contraction times, $\alpha$ is a parameter controlling the rate
 of decline from $\kappa_1$ to $\kappa_2$, and $\epsilon$ is normally
 distributed error.
 
-## Fitting the model
+
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+
+## Accounting for Heterogeneous errors
+
+One of the problems with ...
+
+
+```r
+intervalPlotLog <-
+	makeIntervalPlot(dat) +
+	scale_y_continuous("Inter-contraction interval (min)\n(log scale)",
+                      trans = "log", 
+                      breaks = c(2, 4, 8, 16, 32, 64),
+		      expand = c(0, 0))
+print(intervalPlotLog)
+```
+
+![plot of chunk intervalPlotLog](figure/intervalPlotLog-1.png)
 
 
 ```r
@@ -156,8 +172,5 @@ mod
 ## <simpleError in nls(nonLinearFormula, data = datNoNA, start = list(alpha = 0.05,     k1 = 3.5, k2 = 1.2), trace = TRUE): step factor 0.000488281 reduced below 'minFactor' of 0.000976562>
 ```
 
-This is a stupid error.  The nonlinear solver chases unrealistically low asymptotic inter-contraction intervals.
-
-
-
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
+This is a stupid error.  The nonlinear solver chases unrealistically
+low asymptotic inter-contraction intervals.
