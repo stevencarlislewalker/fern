@@ -10,7 +10,7 @@ output:
 
 ## The birth of Fern
 
-On July 8, 2016 at 11:08pm, my daughter was born.  She is adorable.
+On July 8, 2016 at 11:09pm, my daughter was born.  She is adorable.
 Here she is on July 9.
 
 ![Fern](FernWalker.png)
