@@ -58,7 +58,7 @@ knitr:::kable(dat[5:10,])
 
 ## Exploratory graphs
 
-```{r, fig.width = 4, fig.height = 4}
+```{r intervalPlot, fig.width = 4, fig.height = 4}
 intervalPlot <-
     dat %>%
     filter(!is.na(interval)) %>%
@@ -90,7 +90,7 @@ following.
 source("fernFunctions.R")
 makeEquation(
   "initialModel",
-  '$y = \\kappa_1 e^{- \\alpha x} + \\kappa_2 (1 - e^{- \\alpha x}) + \\epsilon$')
+  '$\\mbox{ \\Huge $ y = \\kappa_1 e^{- \\alpha x} + \\kappa_2 (1 - e^{- \\alpha x}) + \\epsilon $ }$')
 ```
 ![initial model](initialModel.png)
 
