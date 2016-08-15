@@ -74,10 +74,10 @@ print(intervalPlot)
 ```
 
 The inter-contraction intervals are more variable and generally larger
-near the beginning of labour.  It looks like the intervals might
-converge on 3-4 minutes --- shown by the horizontal band --- just
-before we get ready to go to the hospital!  But what kind of model
-might determine such convergence?
+near the beginning of labour (small contraction IDs).  It looks like
+the intervals might converge on 3-4 minutes --- shown by the
+horizontal band --- just before we get ready to go to the hospital!
+But what kind of model might determine such convergence?
 
 It looks like the mean inter-contraction interval starts off somewhere
 near 30 minutes and then declines to asymptotically approach 3-4
@@ -90,7 +90,7 @@ makeEquation(
   '$\\mbox{ \\Huge $ y = \\kappa_1 e^{- \\alpha x} + \\kappa_2 (1 - e^{- \\alpha x}) + \\epsilon $ }$')
 ```
 ![initial model](initialModel.png)
-
+where,
 ```{r, echo = FALSE}
 makeSymbolTable(
   "mathSymbols",
@@ -106,11 +106,27 @@ $\\epsilon$ & normally distributed error \\\\
 ```
 ![math symbols](mathSymbols.png)
 
-where $y$ and $x$ are the inter-contraction interval and contraction
-ID, $\kappa_1$ and $\kappa_2$ are the initial and final
-inter-contraction times, $\alpha$ is a parameter controlling the rate
-of decline from $\kappa_1$ to $\kappa_2$, and $\epsilon$ is normally
-distributed error.
+The first term represents the decay away from the initial
+inter-contraction time, the second term represents the decay towards
+the final inter-contraction time, and the last term is normally
+distributed error.  We can fit this model to the contraction data
+using the `nls` function in `R`.
+```{r}
+datNoNA <- dat %>%
+  as_data_frame %>%
+  filter(!is.na(interval))
+nonLinearFormula <- 
+    as.numeric(interval) / 60 ~
+    exp(k1) *      exp(- alpha * contractionID) + 
+    exp(k2) * (1 - exp(- alpha * contractionID))
+mod <- nls(nonLinearFormula, data = datNoNA, 
+           start = list(alpha = 0.05, k1 = 3.5, k2 = 1.2),
+           trace = TRUE)
+print(summary(mod))
+```
+
+The model parameters converge quite readily, given the choice of
+initial estimates that I got from trial and error.
 
 ```{r, eval = FALSE, echo = FALSE}
 ## Confidence interval on the estimated asymptotic inter-contraction interval

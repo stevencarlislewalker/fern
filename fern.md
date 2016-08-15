@@ -81,10 +81,10 @@ print(intervalPlot)
 ![plot of chunk intervalPlot](figure/intervalPlot-1.png)
 
 The inter-contraction intervals are more variable and generally larger
-near the beginning of labour.  It looks like the intervals might
-converge on 3-4 minutes --- shown by the horizontal band --- just
-before we get ready to go to the hospital!  But what kind of model
-might determine such convergence?
+near the beginning of labour (small contraction IDs).  It looks like
+the intervals might converge on 3-4 minutes --- shown by the
+horizontal band --- just before we get ready to go to the hospital!
+But what kind of model might determine such convergence?
 
 It looks like the mean inter-contraction interval starts off somewhere
 near 30 minutes and then declines to asymptotically approach 3-4
@@ -93,19 +93,71 @@ following.
 
 
 ![initial model](initialModel.png)
-
+where,
 
 ![math symbols](mathSymbols.png)
 
-where $y$ and $x$ are the inter-contraction interval and contraction
-ID, $\kappa_1$ and $\kappa_2$ are the initial and final
-inter-contraction times, $\alpha$ is a parameter controlling the rate
-of decline from $\kappa_1$ to $\kappa_2$, and $\epsilon$ is normally
-distributed error.
+The first term represents the decay away from the initial
+inter-contraction time, the second term represents the decay towards
+the final inter-contraction time, and the last term is normally
+distributed error.  We can fit this model to the contraction data
+using the `nls` function in `R`.
+
+```r
+datNoNA <- dat %>%
+  as_data_frame %>%
+  filter(!is.na(interval))
+nonLinearFormula <- 
+    as.numeric(interval) / 60 ~
+    exp(k1) *      exp(- alpha * contractionID) + 
+    exp(k2) * (1 - exp(- alpha * contractionID))
+mod <- nls(nonLinearFormula, data = datNoNA, 
+           start = list(alpha = 0.05, k1 = 3.5, k2 = 1.2),
+           trace = TRUE)
+```
+
+```
+## 3318.91 :  0.05 3.50 1.20
+## 2796.011 :  0.04550305 3.15061250 1.39553432
+## 2783.705 :  0.04154246 3.06344357 1.33629978
+## 2783.344 :  0.03984476 3.04863673 1.29428788
+## 2783.291 :  0.03922142 3.04347733 1.27585363
+## 2783.285 :  0.03899023 3.04154801 1.26928305
+## 2783.284 :  0.03890401 3.04082705 1.26690060
+## 2783.284 :  0.0388718 3.0405574 1.2660195
+## 2783.284 :  0.03885975 3.04045660 1.26569130
+## 2783.284 :  0.03885525 3.04041888 1.26556875
+```
+
+```r
+print(summary(mod))
+```
+
+```
+## 
+## Formula: as.numeric(interval)/60 ~ exp(k1) * exp(-alpha * contractionID) + 
+##     exp(k2) * (1 - exp(-alpha * contractionID))
+## 
+## Parameters:
+##       Estimate Std. Error t value Pr(>|t|)    
+## alpha  0.03886    0.01972   1.970   0.0523 .  
+## k1     3.04042    0.19993  15.208   <2e-16 ***
+## k2     1.26557    0.60642   2.087   0.0401 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 5.936 on 79 degrees of freedom
+## 
+## Number of iterations to convergence: 9 
+## Achieved convergence tolerance: 9.608e-06
+```
+
+The model parameters converge quite readily, given the choice of
+initial estimates that I got from trial and error.
 
 
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
 
 ## Accounting for Heterogeneous errors
 
