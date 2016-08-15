@@ -41,7 +41,7 @@ library(lubridate)
 library(ggplot2)
 library(scales)
 dat <-
-    fread("contractionData.csv",
+    fread("data/ContractionData.csv",
           colClasses = c("character", "integer")) %>%
       mutate(startTime = ifelse(startTime == "", NA,
                  paste0("2016-07-08 ", startTime, ":00"))) %>%
