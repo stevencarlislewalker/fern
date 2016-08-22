@@ -92,13 +92,6 @@ minutes.  A model with these characteristics is given by the
 following.
 
 
-```
-## Loading required package: tikzDevice
-```
-
-```
-## Loading required package: grid
-```
 ![initial model](math/initialModel.png)
 where,
 

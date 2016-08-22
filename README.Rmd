@@ -9,8 +9,17 @@ output:
 ---
 
 ```{r, echo = FALSE, message = FALSE}
+suppressPackageStartupMessages({
+library(data.table)
+library(dplyr)
+library(fasttime)
+library(lubridate)
+library(scales)
 library(knitr)
 library(ggplot2)
+library(tikzDevice)
+library(grid)
+})
 source("R/fernFunctions.R")
 ```
 
@@ -34,12 +43,6 @@ data.
 Here are the first (and last) six observations that I recorded.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-library(data.table)
-library(dplyr)
-library(fasttime)
-library(lubridate)
-library(ggplot2)
-library(scales)
 dat <-
     fread("data/ContractionData.csv",
           colClasses = c("character", "integer")) %>%
