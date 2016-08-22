@@ -11,7 +11,7 @@ output:
 ```{r, echo = FALSE, message = FALSE}
 library(knitr)
 library(ggplot2)
-source("fernFunctions.R")
+source("R/fernFunctions.R")
 ```
 
 ## The birth of Fern
@@ -89,7 +89,7 @@ makeLatex(
   "initialModel",
   '$\\mbox{ \\Huge $ y = \\kappa_1 e^{- \\alpha x} + \\kappa_2 (1 - e^{- \\alpha x}) + \\epsilon $ }$')
 ```
-![initial model](initialModel.png)
+![initial model](math/initialModel.png)
 where,
 ```{r definitions, echo = FALSE}
 makeLatex(
@@ -104,7 +104,7 @@ $\\epsilon$ & normally distributed error \\\\
 \\end{tabular} }",
   2)
 ```
-![math symbols](mathSymbols.png)
+![math symbols](math/mathSymbols.png)
 
 The first term represents the decay away from the initial
 inter-contraction time, the second term represents the decay towards

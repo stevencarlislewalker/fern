@@ -9,6 +9,7 @@ makeLatex <- function(file, content, height = 0.5) {
     dev.off()
     system(paste0("pdflatex ", fileTex))
     system(paste0("convert ", file, ".pdf", " ", file, ".png"))
+    system(paste0("mv ", file, ".png", " math/", file, ".png"))
 }
 
 makeIntervalPlot <- function(dat) {

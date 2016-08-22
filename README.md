@@ -99,10 +99,10 @@ following.
 ```
 ## Loading required package: grid
 ```
-![initial model](initialModel.png)
+![initial model](math/initialModel.png)
 where,
 
-![math symbols](mathSymbols.png)
+![math symbols](math/mathSymbols.png)
 
 The first term represents the decay away from the initial
 inter-contraction time, the second term represents the decay towards
