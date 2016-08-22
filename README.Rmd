@@ -19,7 +19,7 @@ source("fernFunctions.R")
 On July 8, 2016 at 11:09pm, my daughter was born.  She is adorable.
 Here she is on July 9.
 
-![Fern](FernWalker.png)
+![Fern](photos/FernWalker.png)
 
 ## The contraction data
 
@@ -29,7 +29,7 @@ Our midwives said to call them once the contractions were consistently
 themselves were between 45-90s in duration.  I started collecting
 data.
 
-![Raw Data](rawData.png)
+![Raw Data](photos/rawData.png)
 
 Here are the first (and last) six observations that I recorded.
 
@@ -56,7 +56,7 @@ knitr:::kable(rbind(head(dat), tail(dat)))
 Missing data are inevitable.
 
 Of primary interest are the inter-contraction intervals.
-```{r, warning = FALSE}
+```{r inter contraction intervals, warning = FALSE}
 dat <- dat %>%
   mutate(interval = as.duration(startTime - lag(startTime)))
 knitr:::kable(dat[5:10,])
@@ -84,15 +84,15 @@ near 30 minutes and then declines to asymptotically approach 3-4
 minutes.  A model with these characteristics is given by the
 following.
 
-```{r, echo = FALSE}
-makeEquation(
+```{r initial model, echo = FALSE}
+makeLatex(
   "initialModel",
   '$\\mbox{ \\Huge $ y = \\kappa_1 e^{- \\alpha x} + \\kappa_2 (1 - e^{- \\alpha x}) + \\epsilon $ }$')
 ```
 ![initial model](initialModel.png)
 where,
-```{r, echo = FALSE}
-makeSymbolTable(
+```{r definitions, echo = FALSE}
+makeLatex(
   "mathSymbols",
   "\\mbox{\\Large \\begin{tabular}{ll} 
 $y$ & inter-contraction interval \\\\ 
@@ -111,7 +111,7 @@ inter-contraction time, the second term represents the decay towards
 the final inter-contraction time, and the last term is normally
 distributed error.  We can fit this model to the contraction data
 using the `nls` function in `R`.
-```{r}
+```{r nls}
 datNoNA <- dat %>%
   as_data_frame %>%
   filter(!is.na(interval))
@@ -128,14 +128,14 @@ print(summary(mod))
 The model parameters converge quite readily, given the choice of
 initial estimates that I got from trial and error.
 
-```{r, eval = FALSE, echo = FALSE}
+```{r confidence intervals, eval = FALSE, echo = FALSE}
 ## Confidence interval on the estimated asymptotic inter-contraction interval
 k2Hat <- coef(mod)["k2"]
 k2SE <- sqrt(vcov(mod)["k2", "k2"])
 exp(k2Hat + c(lower = -1.96 * k2SE, estimate = 0, upper = 1.96 * k2SE))
 ```
 
-```{r, eval = TRUE, echo = FALSE}
+```{r plot curve, eval = TRUE, echo = FALSE}
 plotCurve <- function(alpha, k1, k2) {
     x <- 1:nrow(dat)
     logy <- log(exp(k1) * exp(- alpha * x) + exp(k2) * (1 - exp(- alpha * x)))
@@ -161,7 +161,7 @@ intervalPlotLog <-
 print(intervalPlotLog)
 ```
 
-```{r}
+```{r nls no converge}
 datNoNA <- dat %>%
   as_data_frame %>%
   filter(!is.na(interval))

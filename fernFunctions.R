@@ -1,17 +1,4 @@
-makeEquation <- function(file, content) {
-    require(tikzDevice)
-    require(grid)
-    fileTex <- paste0(file, ".tex")
-    tikz(fileTex, standAlone = TRUE,
-         width = 6, 0.5)
-    pushViewport(dataViewport(1:10, 1:10))
-    grid.tikzNode(5, 5, content = content)
-    dev.off()
-    system(paste0("pdflatex ", fileTex))
-    system(paste0("convert ", file, ".pdf", " ", file, ".png"))
-}
-
-makeSymbolTable <- function(file, content, height) {
+makeLatex <- function(file, content, height = 0.5) {
     require(tikzDevice)
     require(grid)
     fileTex <- paste0(file, ".tex")
